@@ -51,12 +51,12 @@ const Login = (props) => {
 
     // Call the server API to check If the given email ID already exists
     const checkAccountExists = (callback) => {
-        fetch("http://localhost:3000/check-account", {
+        fetch("http://localhost:3080/check-account", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(email)
+            body: JSON.stringify({email})
         }).then(r => r.json())
         .then(r => {
             callback(r?.userExists)
@@ -65,12 +65,12 @@ const Login = (props) => {
 
     // Log in a user using email and password
     const logIn = () => {
-        fetch("http://localhost:3000/auth", {
+        fetch("http://localhost:3080/auth", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(email, password)
+            body: JSON.stringify({email, password})
         })
         .then(r => r.json())
         .then(r => {
@@ -104,6 +104,7 @@ const Login = (props) => {
             <div className={'inputContainer'}>
                 <input
                     value={password}
+                    type="password"
                     placeholder="Enter your password here"
                     onChange={(ev)=>setPassword(ev.target.value)}
                     className={'inputBox'}

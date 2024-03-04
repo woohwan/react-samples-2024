@@ -1,3 +1,8 @@
 {
-    "users": []
+  "users": [
+    {
+      "email": "whpark@example.com",
+      "password": "$2b$10$XCU3EJJu04R4iHG5pMADLOwcpMa8ach1qU7VVqhFom/FNU/egUT.m"
+    }
+  ]
 }
