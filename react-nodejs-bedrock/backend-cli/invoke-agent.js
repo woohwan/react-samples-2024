@@ -28,10 +28,10 @@ export const invokeBedrockAgent = async (prompt, sessionId) => {
   //   },
   // });
 
-  const agentId = "IUFLFZG1TW";
-  const agentAliasId = "GDOGYNUEF9";
-  const token = 'B405789D13A1FF2B2EE62B054FB05B0E'
-  const accountId = '532805286864'
+  const agentId = "";
+  const agentAliasId = "";
+  const token = ''
+  const accountId = ''
 
   const command = new InvokeAgentCommand({
     sessionState: { // SessionState
