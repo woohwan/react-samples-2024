@@ -1,9 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const App = () => {
   const [ message, setMessage ] = useState("")
   const [ chats, setChats] = useState([])
   const [ isTyping, setIsTyping ] = useState(false)
+  const [ sessionId, setSessionID] = useState("")
+  const [ token, setToken ] = useState("")
+  const [ accountId, setAccountID] = useState("")
+
+  useEffect(() => {
+    setAccountID("")
+    setSessionID("s-123")
+    setToken("")
+  })
 
   const chat = async(e, message) => {
     e.preventDefault()
@@ -14,6 +23,7 @@ const App = () => {
 
     let msgs = chats
     msgs.push({role: "user", content: message })
+    let prompt = message
     setChats(msgs)
 
     setMessage("")
@@ -24,7 +34,10 @@ const App = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        chats,
+        "prompt": prompt,
+        "accountId": accountId,
+        "token": token,
+        "sessionId": sessionId
       }),
     })
       .then((resp) => resp.json())
