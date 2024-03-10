@@ -1,40 +1,75 @@
-//  https://stackoverflow.com/questions/77874914/how-to-invoke-agent-using-bedrock-agent-runtime-client-in-aws-sdk-for-javascript
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
-import { BedrockAgentRuntimeClient, InvokeAgentCommand } from "@aws-sdk/client-bedrock-agent-runtime"
+import {
+  BedrockAgentRuntimeClient,
+  InvokeAgentCommand,
+} from "@aws-sdk/client-bedrock-agent-runtime";
 
-// import { PromptTemplate } from "@langchain/core/prompts"
+/**
+ * @typedef {Object} ResponseBody
+ * @property {string} completion
+ */
 
-const client = new BedrockAgentRuntimeClient({
-    region: 'us-east-1'
-})
-// const promptTemplate = PromptTemplate.fromTemplate(
-//     "{yeaer}년 {month}월 자원 사용량은?"
-// )
-// const chain = promptTemplate.pipe(model)
+/**
+ * Invokes a Bedrock agent to run an inference using the input
+ * provided in the request body.
+ *
+ * @param {string} prompt - The prompt that you want the Agent to complete.
+ * @param {string} sessionId - An arbitrary identifier for the session.
+ */
+export const invokeBedrockAgent = async (prompt, sessionId) => {
+  const client = new BedrockAgentRuntimeClient({ region: "us-east-1" });
+  // const client = new BedrockAgentRuntimeClient({
+  //   region: "us-east-1",
+  //   credentials: {
+  //     accessKeyId: "accessKeyId", // permission to invoke agent
+  //     secretAccessKey: "accessKeySecret",
+  //   },
+  // });
 
-const input = {
-    agentId: "IUFLFZG1TW",
-    agentAliasId: "GDOGYNUEF9",
-    sessionId: 'fitcloud-js-01',
-    InputText: '2023년 9월 자원 사용량은?'
+  const agentId = "IUFLFZG1TW";
+  const agentAliasId = "GDOGYNUEF9";
+  const token = 'B405789D13A1FF2B2EE62B054FB05B0E'
+  const accountId = '532805286864'
+
+  const command = new InvokeAgentCommand({
+    sessionState: { // SessionState
+      sessionAttributes: { // SessionAttributesMap
+          "token": token,
+          "accountId": accountId,
+      },
+    },
+    agentId,
+    agentAliasId,
+    sessionId,
+    inputText: prompt,
+  });
+
+  try {
+    let completion = "";
+    const response = await client.send(command);
+
+    if (response.completion === undefined) {
+      throw new Error("Completion is undefined");
+    }
+
+    for await (let chunkEvent of response.completion) {
+      const chunk = chunkEvent.chunk;
+      const decodedResponse = new TextDecoder("utf-8").decode(chunk.bytes);
+      completion += decodedResponse;
+    }
+
+    return { sessionId: sessionId, completion };
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// Call function if run directly
+import { fileURLToPath } from "url";
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const result = await invokeBedrockAgent("2023년 9월 자원 사용량은?", "123");
+  console.log(result);
 }
 
-const invokeFitCloud = async () => {
-    return new Promise(async (resolve, reject) => {
-       let completion = "";
-       const command = new InvokeAgentCommand(input);
-       const response = await client.send(command);
- 
-       for await (const chunkEvent of response.completion) {
-         if (chunkEvent.chunk) {
-           const chunk = chunkEvent.chunk;
-           let decoded = new TextDecoder("utf-8").decode(chunk.bytes);
-           completion += decoded;
-         }
-       }      
-       
-       resolve(response);
-    });
- }
-
- invokeFitCloud()
