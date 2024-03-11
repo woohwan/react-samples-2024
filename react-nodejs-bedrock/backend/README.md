@@ -1,7 +1,7 @@
 1. module install
 ```  
 npm init -y
-npm i --save @aws-sdk/client-bedrock-agent
+npm i --save @aws-sdk/client-bedrock-agent-runtime
 npm i --save langchain  @langchain/community
 npm i --save express body-parser cors
 ```  
